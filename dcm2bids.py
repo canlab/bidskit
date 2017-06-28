@@ -92,79 +92,97 @@ def main():
     prot_dict = bids_load_prot_dict(prot_dict_json)
 
     if prot_dict and os.path.isdir(bids_root_dir):
+
         print('')
         print('------------------------------------------------------------')
         print('Pass 2 : Organizing Nifti data into BIDS directories')
         print('------------------------------------------------------------')
         first_pass = False
+
     else:
+
         print('')
         print('------------------------------------------------------------')
-        print('Pass 1 : DICOM to Nifti conversion and dictionary creation')
+        print('Pass 1 : Scan DICOM folders and create dictionary')
         print('------------------------------------------------------------')
         first_pass = True
 
-    # Initialize BIDS output directory
-    if not first_pass:
-        participants_fd = bids_init(bids_root_dir)
+        series_list = scan_dicom_series(dcm_root_dir)
 
-    # Loop over subject directories in DICOM root
-    for dcm_sub_dir in glob(dcm_root_dir + '/*/'):
-
-        SID = os.path.basename(dcm_sub_dir.strip('/'))
-
-        print('')
-        print('Processing subject ' + SID)
-
-        # Loop over session directories in subject directory
-        for dcm_ses_dir in glob(dcm_sub_dir + '/*/'):
-
-            SES = os.path.basename(dcm_ses_dir.strip('/'))
-
-            print('  Processing session ' + SES)
-
-            # BIDS subject, session and conversion directories
-            sub_prefix = 'sub-' + SID
-            ses_prefix = 'ses-' + SES
-            bids_sub_dir = os.path.join(bids_root_dir, sub_prefix)
-            bids_ses_dir = os.path.join(bids_sub_dir, ses_prefix)
-            bids_conv_dir = os.path.join(bids_ses_dir, 'conv')
-
-            # Check if subject/session directory exists
-            # If it doesn't this is a new sub/ses added to the DICOM root and needs conversion
-
-            # Safely create BIDS conversion directory and all containing directories as needed
-            os.makedirs(bids_conv_dir, exist_ok=True)
-
-            if first_pass:
-
-                # Run dcm2niix conversion into temporary conversion directory
-                # This relies on the current CBIC branch of dcm2niix which extracts additional DICOM fields
-                print('  Converting all DICOM images within directory %s' % dcm_ses_dir)
-                devnull = open(os.devnull, 'w')
-                subprocess.call(['dcm2niix', '-b', 'y', '-f', '%n--%p--%q--%s', '-o', bids_conv_dir, dcm_ses_dir],
-                                stdout=devnull, stderr=subprocess.STDOUT)
-
-            else:
-
-                # Get subject age and sex from representative DICOM header
-                dcm_info = bids_dcm_info(dcm_ses_dir)
-
-                # Add line to participants TSV file
-                participants_fd.write("sub-%s\t%s\t%s\n" % (SID, dcm_info['Sex'], dcm_info['Age']))
-
-            # Run DICOM conversions
-            bids_run_conversion(bids_conv_dir, first_pass, prot_dict, bids_ses_dir, SID, SES, use_run)
-
-    if first_pass:
-        # Create a template protocol dictionary
-        bids_create_prot_dict(prot_dict_json, prot_dict)
-    else:
-        # Close participants TSV file
-        participants_fd.close()
+    # # Initialize BIDS output directory
+    # if not first_pass:
+    #     participants_fd = bids_init(bids_root_dir)
+    #
+    # # Loop over subject directories in DICOM root
+    # for dcm_sub_dir in glob(dcm_root_dir + '/*/'):
+    #
+    #     SID = os.path.basename(dcm_sub_dir.strip('/'))
+    #
+    #     print('')
+    #     print('Processing subject ' + SID)
+    #
+    #     # Loop over session directories in subject directory
+    #     for dcm_ses_dir in glob(dcm_sub_dir + '/*/'):
+    #
+    #         SES = os.path.basename(dcm_ses_dir.strip('/'))
+    #
+    #         print('  Processing session ' + SES)
+    #
+    #         # BIDS subject, session and conversion directories
+    #         sub_prefix = 'sub-' + SID
+    #         ses_prefix = 'ses-' + SES
+    #         bids_sub_dir = os.path.join(bids_root_dir, sub_prefix)
+    #         bids_ses_dir = os.path.join(bids_sub_dir, ses_prefix)
+    #         bids_conv_dir = os.path.join(bids_ses_dir, 'conv')
+    #
+    #         # Check if subject/session directory exists
+    #         # If it doesn't this is a new sub/ses added to the DICOM root and needs conversion
+    #
+    #         # Safely create BIDS conversion directory and all containing directories as needed
+    #         os.makedirs(bids_conv_dir, exist_ok=True)
+    #
+    #         if first_pass:
+    #
+    #             # Run dcm2niix conversion into temporary conversion directory
+    #             # This relies on the current CBIC branch of dcm2niix which extracts additional DICOM fields
+    #             print('  Converting all DICOM images within directory %s' % dcm_ses_dir)
+    #             devnull = open(os.devnull, 'w')
+    #             subprocess.call(['dcm2niix', '-b', 'y', '-f', '%n--%p--%q--%s', '-o', bids_conv_dir, dcm_ses_dir],
+    #                             stdout=devnull, stderr=subprocess.STDOUT)
+    #
+    #         else:
+    #
+    #             # Get subject age and sex from representative DICOM header
+    #             dcm_info = bids_dcm_info(dcm_ses_dir)
+    #
+    #             # Add line to participants TSV file
+    #             participants_fd.write("sub-%s\t%s\t%s\n" % (SID, dcm_info['Sex'], dcm_info['Age']))
+    #
+    #         # Run DICOM conversions
+    #         bids_run_conversion(bids_conv_dir, first_pass, prot_dict, bids_ses_dir, SID, SES, use_run)
+    #
+    # if first_pass:
+    #     # Create a template protocol dictionary
+    #     bids_create_prot_dict(prot_dict_json, prot_dict)
+    # else:
+    #     # Close participants TSV file
+    #     participants_fd.close()
 
     # Clean exit
     sys.exit(0)
+
+
+def scan_dicom_series(dcm_dir):
+    """
+    Scan all DICOM images within the DICOM directory to collect unique series descriptions
+
+    :param dcm_dir:
+    :return: series_dict
+    """
+
+    series_list = []
+
+    return series_list
 
 
 def bids_listdir(dname):
