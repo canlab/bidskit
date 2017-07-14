@@ -182,6 +182,13 @@ def scan_dicom_series(dcm_dir):
 
     series_list = []
 
+    for root, dirs, files in os.walk(dcm_dir):
+        path = root.split(os.sep)
+        print((len(path) - 1) * '---', os.path.basename(root))
+        for file in files:
+            print(len(path) * '---', file)
+
+
     return series_list
 
 
