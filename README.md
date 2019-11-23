@@ -1,4 +1,4 @@
-Note: the main branch has been pretty good about incorporating patches for useful features and fixing bugs. Unless we want to heavily modify what bidskit is doing we should probably just contribute to the main branch rather than fork it. So far that's what I've been doing, and all the functionality we might want is getting incorporated there, not here. -Bogdan
+Note: the main branch has been pretty good about incorporating patches for useful features and fixing bugs. Unless we want to heavily modify what bidskit is doing we should probably just contribute to the main branch rather than fork it. So far that's what I've been doing, and all the functionality we might want has been getting incorporated there, not here. Don't use this fork by accident assuming it's representative of what's being used in the lab. Most of us using bidskit (myself and those who predate me on paingen or yoni's chronic back pain study) are using the main branch code. -Bogdan, 11/22/19
 
 # bidskit 
 Python utilities for converting from DICOM to BIDS and NDAR-compliant neuroimaging formats.
